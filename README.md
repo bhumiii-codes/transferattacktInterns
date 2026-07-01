@@ -28,6 +28,7 @@ This repo is intentionally a standalone vanilla transfer-attack exercise.
 - `GRA` — Krish Bansal, Delhi Technological University (DTU) — *Boosting Adversarial Transferability via Gradient Relevance Attack* (ICCV 2023)
 - `IDAA` — Arnav Asthana, IIIT Delhi — student-contributed identity-aware / diversified attack adaptation integrated into the shared CNN face-verification pipeline
 - `DPA_HMA` — Kushal Khemka, Delhi Technological University (DTU) — *Improving the Transferability of Adversarial Attacks on Face Recognition with Diverse Parameters Augmentation* (CVPR 2025)
+- `DYNAMIC_MORPH` — Puneet Kumar, Indian Institute of Information Technology, Senapati, Manipur — student-submitted morph-style semantic face-region mixing adaptation, presented as D-FMA
 
 ## Current official subset baseline
 - SI_NI_FGSM: 29.17%
@@ -114,3 +115,4 @@ Read:
 - `results_student_attacks/idaa/README.md`
 - `results_student_attacks/dpa_hma/README.md`
 - `results_student_attacks/dpa_hma/dpa_hma_vs_current_baseline_summary.csv`
+- `results_student_attacks/dynamic_morph/README.md`
