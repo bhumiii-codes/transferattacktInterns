@@ -26,6 +26,7 @@ This repo is intentionally a standalone vanilla transfer-attack exercise.
 - `ATT_CNN` — Keshav Raj, IIIT Delhi — CNN-side ATT-inspired adaptation motivated by *ATT* (NeurIPS 2024)
 - `LI_BOOST_MI` — Charushi, IGDTUW — MI-style logarithmic-shift boosting transfer attack
 - `GRA` — Krish Bansal, Delhi Technological University (DTU) — *Boosting Adversarial Transferability via Gradient Relevance Attack* (ICCV 2023)
+- `IDAA` — Arnav Asthana, IIIT Delhi — student-contributed identity-aware / diversified attack adaptation integrated into the shared CNN face-verification pipeline
 - `DPA_HMA` — Kushal Khemka, Delhi Technological University (DTU) — *Improving the Transferability of Adversarial Attacks on Face Recognition with Diverse Parameters Augmentation* (CVPR 2025)
 
 ## Current official subset baseline
@@ -110,5 +111,6 @@ Read:
 - `results_student_attacks/li_boost_mi/README.md`
 - `results_student_attacks/li_boost_mi/li_boost_mi_vs_current_baseline_summary.csv`
 - `results_student_attacks/gra/README.md`
+- `results_student_attacks/idaa/README.md`
 - `results_student_attacks/dpa_hma/README.md`
 - `results_student_attacks/dpa_hma/dpa_hma_vs_current_baseline_summary.csv`
