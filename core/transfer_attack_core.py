@@ -39,6 +39,7 @@ ALL_ATTACKS = [
     'DPA_HMA',
     'DYNAMIC_MORPH',
     'DPA_HMA_ENSEMBLE',
+    'ADAMSI_FGM',
 ]
 
 ATTACK_COLS = {
@@ -60,6 +61,7 @@ ATTACK_COLS = {
     'DPA_HMA': 'dpa_hma_path',
     'DYNAMIC_MORPH': 'dynamic_morph_path',
     'DPA_HMA_ENSEMBLE': 'dpa_hma_ensemble_path',
+    'ADAMSI_FGM': 'adamsi_fgm_path',
 }
 
 EPSILON = 0.062
@@ -253,6 +255,41 @@ def pgd_attack(model, x, tgt_emb, attack_type, random_start=True):
             loss = attack_loss(cos, attack_type)
         grad = tape.gradient(loss, adv)
         adv = adv + alpha * tf.sign(grad)
+        adv = tf.clip_by_value(adv, x - EPSILON, x + EPSILON)
+        adv = tf.clip_by_value(adv, -1.0, 1.0)
+    return adv
+
+
+
+# Student-contributed attack integration:
+# ADAMSI_FGM - adapted from "On the Convergence of an Adaptive Momentum Method
+# for Adversarial Attacks" (Long et al., AAAI 2024).
+# This is a simplified CNN / face-verification adaptation of the paper's core idea
+# (adaptive momentum coefficient + adaptive step-size replacing sign()), not an
+# official reproduction of the authors' exact convergence-proof implementation.
+def adamsi_fgm(model, x, tgt_emb, attack_type, beta1=0.9, eps_adapt=1e-8):
+    adv = tf.identity(x)
+    m = tf.zeros_like(x)
+    v = tf.zeros_like(x)
+    tgt_emb = tf.nn.l2_normalize(tgt_emb, axis=1)
+    alpha0 = EPSILON / NUM_ITER
+
+    for t in range(1, NUM_ITER + 1):
+        with tf.GradientTape() as tape:
+            tape.watch(adv)
+            emb = compute_embedding(model, adv)
+            cos = tf.reduce_sum(emb * tgt_emb, axis=1)
+            loss = attack_loss(cos, attack_type)
+        grad = tape.gradient(loss, adv)
+        grad_norm = grad / (tf.reduce_mean(tf.abs(grad)) + 1e-8)
+
+        beta1_t = beta1 / tf.sqrt(tf.cast(t, tf.float32))
+        m = beta1_t * m + (1 - beta1_t) * grad_norm
+
+        v = v + tf.square(grad_norm)
+        adapt_step = m / (tf.sqrt(v) + eps_adapt)
+
+        adv = adv + alpha0 * NUM_ITER * adapt_step
         adv = tf.clip_by_value(adv, x - EPSILON, x + EPSILON)
         adv = tf.clip_by_value(adv, -1.0, 1.0)
     return adv
@@ -1372,6 +1409,8 @@ def run_attack(attack_name: str, model, src, tgt, attack_type: str, input_size):
         return dpa_hma(model, src, tgt_emb, attack_type)
     if attack_name == 'DYNAMIC_MORPH':
         return dynamic_morph_mi_fgsm(model, src, tgt, attack_type, input_size)
+    if attack_name == 'ADAMSI_FGM':
+        return adamsi_fgm(model, src, tgt_emb, attack_type)
     if attack_name == 'DPA_HMA_ENSEMBLE':
         raise ValueError(
             'DPA_HMA_ENSEMBLE requires dpa_hma_ensemble(...) with victim-specific '
